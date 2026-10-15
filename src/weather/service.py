@@ -1,4 +1,4 @@
-"""Mock weather service that returns predefined forecasts."""
+"""Weather service: the public entry point of the ``weather`` package."""
 
 from weather.exceptions import CityNotFoundError, InvalidAPIKeyError, InvalidCityError
 from weather.models import Forecast
