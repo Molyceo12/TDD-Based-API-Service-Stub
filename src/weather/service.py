@@ -7,15 +7,15 @@ class WeatherServiceError(Exception):
     """Base class for all weather service errors."""
 
 
-class CityNotFoundError(Exception):
+class CityNotFoundError(WeatherServiceError):
     """The city is not one of the known cities."""
 
 
-class InvalidAPIKeyError(Exception):
+class InvalidAPIKeyError(WeatherServiceError):
     """The API key is missing or not valid."""
 
 
-class InvalidCityError(Exception):
+class InvalidCityError(WeatherServiceError):
     """The city name is empty or blank."""
 
 
