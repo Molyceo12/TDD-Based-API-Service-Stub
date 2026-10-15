@@ -11,6 +11,10 @@ class InvalidAPIKeyError(Exception):
     """The API key is missing or not valid."""
 
 
+class InvalidCityError(Exception):
+    """The city name is empty or blank."""
+
+
 @dataclass(frozen=True)
 class Forecast:
     """Weather forecast for one city."""
