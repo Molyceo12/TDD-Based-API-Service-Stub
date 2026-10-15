@@ -7,6 +7,10 @@ class CityNotFoundError(Exception):
     """The city is not one of the known cities."""
 
 
+class InvalidAPIKeyError(Exception):
+    """The API key is missing or not valid."""
+
+
 @dataclass(frozen=True)
 class Forecast:
     """Weather forecast for one city."""
