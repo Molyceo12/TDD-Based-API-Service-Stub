@@ -1,36 +1,10 @@
 """Mock weather service that returns predefined forecasts."""
 
-from dataclasses import dataclass
-
-
-class WeatherServiceError(Exception):
-    """Base class for all weather service errors."""
-
-
-class CityNotFoundError(WeatherServiceError):
-    """The city is not one of the known cities."""
-
-
-class InvalidAPIKeyError(WeatherServiceError):
-    """The API key is missing or not valid."""
-
-
-class InvalidCityError(WeatherServiceError):
-    """The city name is empty or blank."""
-
-
-@dataclass(frozen=True)
-class Forecast:
-    """Weather forecast for one city."""
-
-    city: str
-    temperature_c: float
-    condition: str
-    humidity: int
-
+from weather.exceptions import CityNotFoundError, InvalidAPIKeyError, InvalidCityError
+from weather.models import Forecast
 
 # Keys are lowercase so lookups can ignore the letter case of the input.
-KNOWN_FORECASTS = {
+KNOWN_FORECASTS: dict[str, Forecast] = {
     "london": Forecast("London", 15.0, "Cloudy", 72),
     "paris": Forecast("Paris", 18.0, "Sunny", 55),
     "new york": Forecast("New York", 22.0, "Partly cloudy", 60),
@@ -38,23 +12,39 @@ KNOWN_FORECASTS = {
     "nairobi": Forecast("Nairobi", 24.0, "Sunny", 50),
 }
 
-
 VALID_API_KEYS = frozenset({"demo-key", "test-key"})
 
 
 class WeatherService:
-    """Returns weather forecasts for cities."""
+    """Client for the mock weather API.
+
+    Attributes:
+        api_key: Key sent with every request; must be in ``VALID_API_KEYS``.
+    """
 
     def __init__(self, api_key: str) -> None:
         self.api_key = api_key
 
     def get_forecast(self, city: str) -> Forecast:
-        """Return the forecast for a city."""
+        """Return the predefined forecast for a city.
+
+        Args:
+            city: City name; letter case and surrounding spaces are ignored.
+
+        Returns:
+            The forecast for the city.
+
+        Raises:
+            InvalidAPIKeyError: If the API key is not valid.
+            InvalidCityError: If the city name is empty or blank.
+            CityNotFoundError: If the city is not a known city.
+        """
         if self.api_key not in VALID_API_KEYS:
             raise InvalidAPIKeyError("Invalid API key")
-        if not city.strip():
+        name = city.strip()
+        if not name:
             raise InvalidCityError("City name must not be empty")
-        forecast = KNOWN_FORECASTS.get(city.strip().lower())
+        forecast = KNOWN_FORECASTS.get(name.lower())
         if forecast is None:
             raise CityNotFoundError(f"City not found: {city}")
         return forecast

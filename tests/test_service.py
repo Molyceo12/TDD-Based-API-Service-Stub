@@ -2,14 +2,14 @@
 
 import pytest
 
-from weather.service import (
+from weather.exceptions import (
     CityNotFoundError,
-    Forecast,
     InvalidAPIKeyError,
     InvalidCityError,
-    WeatherService,
     WeatherServiceError,
 )
+from weather.models import Forecast
+from weather.service import WeatherService
 
 
 @pytest.mark.parametrize(
