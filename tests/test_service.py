@@ -2,7 +2,7 @@
 
 import pytest
 
-from weather.service import Forecast, WeatherService
+from weather.service import CityNotFoundError, Forecast, WeatherService
 
 
 @pytest.mark.parametrize(
@@ -27,3 +27,11 @@ def test_get_forecast_ignores_case_and_spaces(
     service: WeatherService, city: str
 ) -> None:
     assert service.get_forecast(city) == Forecast("London", 15.0, "Cloudy", 72)
+
+
+@pytest.mark.parametrize("city", ["Atlantis", "Gotham", "Londonn"])
+def test_get_forecast_unknown_city_raises_city_not_found(
+    service: WeatherService, city: str
+) -> None:
+    with pytest.raises(CityNotFoundError, match=city):
+        service.get_forecast(city)

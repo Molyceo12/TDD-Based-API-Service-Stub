@@ -3,6 +3,10 @@
 from dataclasses import dataclass
 
 
+class CityNotFoundError(Exception):
+    """The city is not one of the known cities."""
+
+
 @dataclass(frozen=True)
 class Forecast:
     """Weather forecast for one city."""
