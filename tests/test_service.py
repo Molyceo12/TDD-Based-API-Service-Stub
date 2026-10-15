@@ -20,3 +20,10 @@ def test_get_forecast_returns_each_known_city(
     service: WeatherService, expected: Forecast
 ) -> None:
     assert service.get_forecast(expected.city) == expected
+
+
+@pytest.mark.parametrize("city", ["london", "LONDON", "  London  ", " lOnDoN"])
+def test_get_forecast_ignores_case_and_spaces(
+    service: WeatherService, city: str
+) -> None:
+    assert service.get_forecast(city) == Forecast("London", 15.0, "Cloudy", 72)
