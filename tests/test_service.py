@@ -9,8 +9,25 @@ from weather.exceptions import (
     InvalidCityError,
     WeatherServiceError,
 )
-from weather.models import Forecast
+from weather.models import Forecast, ForecastRequest
+from weather.providers import WeatherProvider
 from weather.service import WeatherService
+
+ATLANTIS = Forecast("Atlantis", 30.0, "Stormy", 99)
+
+
+def test_get_forecast_uses_injected_provider(mocker: MockerFixture) -> None:
+    provider = mocker.create_autospec(WeatherProvider, instance=True)
+    provider.fetch.return_value = ATLANTIS
+    assert WeatherService("demo-key", provider).get_forecast(" Atlantis ") == ATLANTIS
+    provider.fetch.assert_called_once_with(ForecastRequest("Atlantis"))
+
+
+def test_get_forecast_raises_when_provider_has_no_data(mocker: MockerFixture) -> None:
+    provider = mocker.create_autospec(WeatherProvider, instance=True)
+    provider.fetch.return_value = None
+    with pytest.raises(CityNotFoundError):
+        WeatherService("demo-key", provider).get_forecast("London")
 
 
 @pytest.mark.parametrize(
@@ -70,6 +87,5 @@ def test_all_errors_are_weather_service_errors(api_key: str, city: str) -> None:
 def test_get_forecast_reads_from_forecast_table(
     service: WeatherService, mocker: MockerFixture
 ) -> None:
-    fake = Forecast("Atlantis", 30.0, "Stormy", 99)
-    mocker.patch.dict("weather.service.KNOWN_FORECASTS", {"atlantis": fake})
-    assert service.get_forecast("Atlantis") == fake
+    mocker.patch.dict("weather.providers.KNOWN_FORECASTS", {"atlantis": ATLANTIS})
+    assert service.get_forecast("Atlantis") == ATLANTIS

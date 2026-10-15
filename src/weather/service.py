@@ -1,16 +1,17 @@
-"""Weather service: the public entry point of the ``weather`` package."""
+"""Weather service, the package entry point: checks requests and asks a provider."""
 
-from weather.exceptions import CityNotFoundError, InvalidAPIKeyError, InvalidCityError
-from weather.models import Forecast
+import logging
 
-# Keys are lowercase so lookups can ignore the letter case of the input.
-KNOWN_FORECASTS: dict[str, Forecast] = {
-    "london": Forecast("London", 15.0, "Cloudy", 72),
-    "paris": Forecast("Paris", 18.0, "Sunny", 55),
-    "new york": Forecast("New York", 22.0, "Partly cloudy", 60),
-    "tokyo": Forecast("Tokyo", 26.0, "Rainy", 80),
-    "nairobi": Forecast("Nairobi", 24.0, "Sunny", 50),
-}
+from weather.exceptions import (
+    CityNotFoundError,
+    InvalidAPIKeyError,
+    InvalidCityError,
+    WeatherServiceError,
+)
+from weather.models import Forecast, ForecastRequest
+from weather.providers import MockWeatherProvider, WeatherProvider
+
+logger = logging.getLogger(__name__)
 
 VALID_API_KEYS = frozenset({"demo-key", "test-key"})
 
@@ -20,13 +21,15 @@ class WeatherService:
 
     Attributes:
         api_key: Key sent with every request; must be in ``VALID_API_KEYS``.
+        provider: Source of forecasts; ``MockWeatherProvider`` by default.
     """
 
-    def __init__(self, api_key: str) -> None:
+    def __init__(self, api_key: str, provider: WeatherProvider | None = None) -> None:
         self.api_key = api_key
+        self.provider = provider or MockWeatherProvider()
 
     def get_forecast(self, city: str) -> Forecast:
-        """Return the predefined forecast for a city.
+        """Return the forecast for a city.
 
         Args:
             city: City name; letter case and surrounding spaces are ignored.
@@ -37,14 +40,30 @@ class WeatherService:
         Raises:
             InvalidAPIKeyError: If the API key is not valid.
             InvalidCityError: If the city name is empty or blank.
-            CityNotFoundError: If the city is not a known city.
+            CityNotFoundError: If the provider has no forecast for the city.
         """
+        name = city.strip()
+        logger.info("request city=%s", name)
+        try:
+            forecast = self._find(name)
+        except WeatherServiceError as exc:
+            logger.warning("error city=%s reason=%s", name, exc)
+            raise
+        logger.info(
+            "response city=%s condition=%s temperature_c=%s",
+            forecast.city,
+            forecast.condition,
+            forecast.temperature_c,
+        )
+        return forecast
+
+    def _find(self, name: str) -> Forecast:
+        """Check the request and return the provider's forecast."""
         if self.api_key not in VALID_API_KEYS:
             raise InvalidAPIKeyError("Invalid API key")
-        name = city.strip()
         if not name:
             raise InvalidCityError("City name must not be empty")
-        forecast = KNOWN_FORECASTS.get(name.lower())
+        forecast = self.provider.fetch(ForecastRequest(name))
         if forecast is None:
-            raise CityNotFoundError(f"City not found: {city}")
+            raise CityNotFoundError(f"City not found: {name}")
         return forecast
