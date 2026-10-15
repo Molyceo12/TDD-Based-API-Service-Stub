@@ -1,0 +1,17 @@
+TDD Weather API Stub - Test Coverage Report
+Generated: 2026-10-15 19:48 | Python 3.14.8
+Command: python -m pytest --cov --cov-report=term-missing
+
+_______________ coverage: platform win32, python 3.14.8-final-0 _______________
+
+Name                        Stmts   Miss Branch BrPart  Cover   Missing
+-----------------------------------------------------------------------
+src\weather\__init__.py         0      0      0      0   100%
+src\weather\exceptions.py       4      0      0      0   100%
+src\weather\models.py           5      0      0      0   100%
+src\weather\providers.py        7      0      0      0   100%
+src\weather\service.py         29      0      6      0   100%
+-----------------------------------------------------------------------
+TOTAL                          45      0      6      0   100%
+Required test coverage of 95.0% reached. Total coverage: 100.00%
+32 passed in 0.14s
