@@ -2,6 +2,7 @@
 
 from weather.exceptions import CityNotFoundError, InvalidAPIKeyError, InvalidCityError
 from weather.models import Forecast
+from weather.providers import WeatherProvider
 
 # Keys are lowercase so lookups can ignore the letter case of the input.
 KNOWN_FORECASTS: dict[str, Forecast] = {
@@ -22,8 +23,9 @@ class WeatherService:
         api_key: Key sent with every request; must be in ``VALID_API_KEYS``.
     """
 
-    def __init__(self, api_key: str) -> None:
+    def __init__(self, api_key: str, provider: WeatherProvider | None = None) -> None:
         self.api_key = api_key
+        self.provider = provider
 
     def get_forecast(self, city: str) -> Forecast:
         """Return the predefined forecast for a city.
