@@ -8,6 +8,7 @@ from weather.service import (
     InvalidAPIKeyError,
     InvalidCityError,
     WeatherService,
+    WeatherServiceError,
 )
 
 
@@ -55,3 +56,11 @@ def test_get_forecast_empty_city_raises_invalid_city(
 ) -> None:
     with pytest.raises(InvalidCityError):
         service.get_forecast(city)
+
+
+@pytest.mark.parametrize(
+    ("api_key", "city"), [("demo-key", "Atlantis"), ("bad", "London"), ("demo-key", "")]
+)
+def test_all_errors_are_weather_service_errors(api_key: str, city: str) -> None:
+    with pytest.raises(WeatherServiceError):
+        WeatherService(api_key=api_key).get_forecast(city)

@@ -3,6 +3,10 @@
 from dataclasses import dataclass
 
 
+class WeatherServiceError(Exception):
+    """Base class for all weather service errors."""
+
+
 class CityNotFoundError(Exception):
     """The city is not one of the known cities."""
 
