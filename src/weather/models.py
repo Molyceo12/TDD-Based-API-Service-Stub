@@ -18,3 +18,14 @@ class Forecast:
     temperature_c: float
     condition: str
     humidity: int
+
+
+@dataclass(frozen=True)
+class ForecastRequest:
+    """Parameters sent to a weather provider.
+
+    Attributes:
+        city: City name, already stripped of surrounding spaces.
+    """
+
+    city: str
