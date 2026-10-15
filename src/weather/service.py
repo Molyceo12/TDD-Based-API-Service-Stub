@@ -13,6 +13,15 @@ class Forecast:
     humidity: int
 
 
+KNOWN_FORECASTS = {
+    "London": Forecast("London", 15.0, "Cloudy", 72),
+    "Paris": Forecast("Paris", 18.0, "Sunny", 55),
+    "New York": Forecast("New York", 22.0, "Partly cloudy", 60),
+    "Tokyo": Forecast("Tokyo", 26.0, "Rainy", 80),
+    "Nairobi": Forecast("Nairobi", 24.0, "Sunny", 50),
+}
+
+
 class WeatherService:
     """Returns weather forecasts for cities."""
 
@@ -21,4 +30,4 @@ class WeatherService:
 
     def get_forecast(self, city: str) -> Forecast:
         """Return the forecast for a city."""
-        return Forecast(city, 15.0, "Cloudy", 72)
+        return KNOWN_FORECASTS[city]
