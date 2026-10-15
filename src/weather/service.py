@@ -35,4 +35,7 @@ class WeatherService:
 
     def get_forecast(self, city: str) -> Forecast:
         """Return the forecast for a city."""
-        return KNOWN_FORECASTS[city.strip().lower()]
+        forecast = KNOWN_FORECASTS.get(city.strip().lower())
+        if forecast is None:
+            raise CityNotFoundError(f"City not found: {city}")
+        return forecast
