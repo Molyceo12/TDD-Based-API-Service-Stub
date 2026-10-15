@@ -48,6 +48,8 @@ class WeatherService:
         """Return the forecast for a city."""
         if self.api_key not in VALID_API_KEYS:
             raise InvalidAPIKeyError("Invalid API key")
+        if not city.strip():
+            raise InvalidCityError("City name must not be empty")
         forecast = KNOWN_FORECASTS.get(city.strip().lower())
         if forecast is None:
             raise CityNotFoundError(f"City not found: {city}")
