@@ -88,5 +88,5 @@ def test_get_forecast_reads_from_forecast_table(
     service: WeatherService, mocker: MockerFixture
 ) -> None:
     fake = Forecast("Atlantis", 30.0, "Stormy", 99)
-    mocker.patch.dict("weather.service.KNOWN_FORECASTS", {"atlantis": fake})
+    mocker.patch.dict("weather.providers.KNOWN_FORECASTS", {"atlantis": fake})
     assert service.get_forecast("Atlantis") == fake
