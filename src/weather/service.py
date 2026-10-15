@@ -1,7 +1,7 @@
 """Mock weather service that returns predefined forecasts."""
 
 from weather.exceptions import CityNotFoundError, InvalidAPIKeyError, InvalidCityError
-from weather.models import Forecast
+from weather.models import Forecast, ForecastRequest
 from weather.providers import WeatherProvider
 
 # Keys are lowercase so lookups can ignore the letter case of the input.
@@ -46,7 +46,10 @@ class WeatherService:
         name = city.strip()
         if not name:
             raise InvalidCityError("City name must not be empty")
-        forecast = KNOWN_FORECASTS.get(name.lower())
+        if self.provider is not None:
+            forecast = self.provider.fetch(ForecastRequest(name))
+        else:
+            forecast = KNOWN_FORECASTS.get(name.lower())
         if forecast is None:
             raise CityNotFoundError(f"City not found: {city}")
         return forecast
