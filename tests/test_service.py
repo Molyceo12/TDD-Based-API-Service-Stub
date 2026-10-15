@@ -1,6 +1,7 @@
 """Tests for the weather service."""
 
 import pytest
+from pytest_mock import MockerFixture
 
 from weather.exceptions import (
     CityNotFoundError,
@@ -64,3 +65,11 @@ def test_get_forecast_empty_city_raises_invalid_city(
 def test_all_errors_are_weather_service_errors(api_key: str, city: str) -> None:
     with pytest.raises(WeatherServiceError):
         WeatherService(api_key=api_key).get_forecast(city)
+
+
+def test_get_forecast_reads_from_forecast_table(
+    service: WeatherService, mocker: MockerFixture
+) -> None:
+    fake = Forecast("Atlantis", 30.0, "Stormy", 99)
+    mocker.patch.dict("weather.service.KNOWN_FORECASTS", {"atlantis": fake})
+    assert service.get_forecast("Atlantis") == fake
