@@ -31,6 +31,9 @@ KNOWN_FORECASTS = {
 }
 
 
+VALID_API_KEYS = frozenset({"demo-key", "test-key"})
+
+
 class WeatherService:
     """Returns weather forecasts for cities."""
 
@@ -39,6 +42,8 @@ class WeatherService:
 
     def get_forecast(self, city: str) -> Forecast:
         """Return the forecast for a city."""
+        if self.api_key not in VALID_API_KEYS:
+            raise InvalidAPIKeyError("Invalid API key")
         forecast = KNOWN_FORECASTS.get(city.strip().lower())
         if forecast is None:
             raise CityNotFoundError(f"City not found: {city}")
