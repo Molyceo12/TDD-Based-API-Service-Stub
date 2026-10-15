@@ -13,12 +13,13 @@ class Forecast:
     humidity: int
 
 
+# Keys are lowercase so lookups can ignore the letter case of the input.
 KNOWN_FORECASTS = {
-    "London": Forecast("London", 15.0, "Cloudy", 72),
-    "Paris": Forecast("Paris", 18.0, "Sunny", 55),
-    "New York": Forecast("New York", 22.0, "Partly cloudy", 60),
-    "Tokyo": Forecast("Tokyo", 26.0, "Rainy", 80),
-    "Nairobi": Forecast("Nairobi", 24.0, "Sunny", 50),
+    "london": Forecast("London", 15.0, "Cloudy", 72),
+    "paris": Forecast("Paris", 18.0, "Sunny", 55),
+    "new york": Forecast("New York", 22.0, "Partly cloudy", 60),
+    "tokyo": Forecast("Tokyo", 26.0, "Rainy", 80),
+    "nairobi": Forecast("Nairobi", 24.0, "Sunny", 50),
 }
 
 
@@ -30,4 +31,4 @@ class WeatherService:
 
     def get_forecast(self, city: str) -> Forecast:
         """Return the forecast for a city."""
-        return KNOWN_FORECASTS[city]
+        return KNOWN_FORECASTS[city.strip().lower()]
