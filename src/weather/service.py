@@ -1,4 +1,4 @@
-"""Weather service: checks requests and asks a provider for the forecast."""
+"""Weather service, the package entry point: checks requests and asks a provider."""
 
 import logging
 
