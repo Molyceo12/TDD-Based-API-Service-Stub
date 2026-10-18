@@ -52,6 +52,13 @@ Try it from the terminal:
 python -m poetry run python -c "from weather.service import WeatherService; print(WeatherService('demo-key').get_forecast('Tokyo'))"
 ```
 
+Or run the demo, which prints sample forecasts and every error type as a table
+(the service's log lines are hidden there):
+
+```bash
+python -m poetry run python demo.py
+```
+
 Log lines (`key=value` style):
 
 ```
@@ -101,18 +108,18 @@ Every feature was built in the same cycle:
 
 The commit history shows the cycle (`test: ... (red)` → `feat: ... (green)` → `refactor: ...`):
 
-| Cycle | 🔴 Red | 🟢 Green |
-|---|---|---|
-| London forecast | test: get_forecast returns London forecast | feat: return predefined London forecast |
-| Known cities | test: every known city returns its own forecast | feat: add predefined forecasts for known cities |
-| Case/spaces | test: get_forecast ignores case and extra spaces | feat: ignore case and extra spaces in city names |
-| Unknown city | test: unknown city raises CityNotFoundError | feat: raise CityNotFoundError for unknown cities |
-| API key | test: invalid API key raises InvalidAPIKeyError | feat: check API key before returning a forecast |
-| Empty city | test: empty or blank city raises InvalidCityError | feat: validate city input |
-| Error base | test: all service errors share WeatherServiceError base | feat: make service errors inherit from WeatherServiceError |
-| Provider | test: service gets forecasts from an injected provider | feat: get forecasts from an injected provider |
-| Mock provider | test: mock provider returns known cities and None | feat: move the forecast table into MockWeatherProvider |
-| Logging | test: requests, responses and errors are logged | feat: log requests, responses and errors |
+| Cycle | 🔴 Red | 🟢 Green | 🔵 Refactor |
+|---|---|---|---|
+| London forecast | test: get_forecast returns London forecast | feat: return predefined London forecast | — |
+| Known cities | test: every known city returns its own forecast | feat: add predefined forecasts for known cities | refactor: add service fixture and name test cases by city |
+| Case/spaces | test: get_forecast ignores case and extra spaces | feat: ignore case and extra spaces in city names | — |
+| Unknown city | test: unknown city raises CityNotFoundError | feat: raise CityNotFoundError for unknown cities | — |
+| API key | test: invalid API key raises InvalidAPIKeyError | feat: check API key before returning a forecast | — |
+| Empty city | test: empty or blank city raises InvalidCityError | feat: validate city input | — |
+| Error base | test: all service errors share WeatherServiceError base | feat: make service errors inherit from WeatherServiceError | refactor: move models and exceptions into their own modules |
+| Provider | test: service gets forecasts from an injected provider | feat: get forecasts from an injected provider | — |
+| Mock provider | test: mock provider returns known cities and None | feat: move the forecast table into MockWeatherProvider | — |
+| Logging | test: requests, responses and errors are logged | feat: log requests, responses and errors | refactor: reuse the Atlantis test forecast |
 
 Red commits contain the failing test plus only an empty stub, so pre-commit (mypy) still
 passes while the test fails for the right reason (the feature is missing).
