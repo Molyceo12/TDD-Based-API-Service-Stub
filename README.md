@@ -59,6 +59,24 @@ Or run the demo, which prints sample forecasts and every error type as a table
 python -m poetry run python demo.py
 ```
 
+Output:
+
+```
++-------------+---------------+-----------------------------------------------+
+| API key     | City          | Result                                        |
++-------------+---------------+-----------------------------------------------+
+| 'demo-key'  | 'London'      | London, 15.0 C, Cloudy, 72%                   |
+| 'demo-key'  | '  nEw YoRk ' | New York, 22.0 C, Partly cloudy, 60%          |
+| 'test-key'  | 'Tokyo'       | Tokyo, 26.0 C, Rainy, 80%                     |
+| 'demo-key'  | 'Atlantis'    | CityNotFoundError: City not found: Atlantis   |
+| 'demo-key'  | 'Londonn'     | CityNotFoundError: City not found: Londonn    |
+| 'demo-key'  | ''            | InvalidCityError: City name must not be empty |
+| 'demo-key'  | '   '         | InvalidCityError: City name must not be empty |
+| 'wrong-key' | 'London'      | InvalidAPIKeyError: Invalid API key           |
+| 'DEMO-KEY'  | 'Paris'       | InvalidAPIKeyError: Invalid API key           |
++-------------+---------------+-----------------------------------------------+
+```
+
 Log lines (`key=value` style):
 
 ```
