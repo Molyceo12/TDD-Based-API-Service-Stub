@@ -3,6 +3,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from weather import create_weather_service
 from weather.exceptions import (
     CityNotFoundError,
     InvalidAPIKeyError,
@@ -65,7 +66,7 @@ def test_get_forecast_unknown_city_raises_city_not_found(
 @pytest.mark.parametrize("api_key", ["wrong-key", "", "DEMO-KEY"])
 def test_get_forecast_invalid_api_key_raises(api_key: str) -> None:
     with pytest.raises(InvalidAPIKeyError):
-        WeatherService(api_key=api_key).get_forecast("London")
+        create_weather_service(api_key).get_forecast("London")
 
 
 @pytest.mark.parametrize("city", ["", "   ", "\t\n"])
@@ -81,7 +82,7 @@ def test_get_forecast_empty_city_raises_invalid_city(
 )
 def test_all_errors_are_weather_service_errors(api_key: str, city: str) -> None:
     with pytest.raises(WeatherServiceError):
-        WeatherService(api_key=api_key).get_forecast(city)
+        create_weather_service(api_key).get_forecast(city)
 
 
 def test_get_forecast_reads_from_forecast_table(

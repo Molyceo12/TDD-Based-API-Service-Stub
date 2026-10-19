@@ -34,22 +34,34 @@ Without Poetry: `python -m pip install -r requirements.txt` then `python -m pip 
 ## Usage
 
 ```python
-from weather.services import WeatherService
+from weather import create_weather_service
 
-service = WeatherService("demo-key")         # valid keys: "demo-key", "test-key"
+service = create_weather_service("demo-key")  # valid keys: "demo-key", "test-key"
 service.get_forecast("London")
 # Forecast(city='London', temperature_c=15.0, condition='Cloudy', humidity=72)
 
 service.get_forecast("  paris ")             # Paris forecast (case/spaces ignored)
 service.get_forecast("Atlantis")             # CityNotFoundError: City not found: Atlantis
 service.get_forecast("")                     # InvalidCityError
-WeatherService("wrong").get_forecast("London")   # InvalidAPIKeyError
+create_weather_service("wrong").get_forecast("London")   # InvalidAPIKeyError
+```
+
+Use another data source by passing any `WeatherProvider`:
+
+```python
+from weather import create_weather_service
+from weather.providers import WeatherProvider
+
+class MyApiProvider(WeatherProvider):
+    def fetch(self, request): ...           # return a Forecast, or None if unknown
+
+service = create_weather_service("demo-key", MyApiProvider())
 ```
 
 Try it from the terminal:
 
 ```bash
-python -m poetry run python -c "from weather.services import WeatherService; print(WeatherService('demo-key').get_forecast('Tokyo'))"
+python -m poetry run python -c "from weather import create_weather_service; print(create_weather_service('demo-key').get_forecast('Tokyo'))"
 ```
 
 Or run the demo, which prints sample forecasts and every error type as a table
@@ -89,14 +101,15 @@ WARNING  weather.services.weather_service  error city=Atlantis reason=City not f
 
 ```
             your code
-                │  get_forecast("London")
+                │  create_weather_service(key, provider=None)   picks the provider
+                │  get_forecast("London")                        (MockWeatherProvider if none)
                 ▼
         ┌────────────────┐   checks API key + city, logs, raises errors
         │ WeatherService │
         └───────┬────────┘
                 │  fetch(ForecastRequest("London"))
                 ▼
-      ┌────────────────────┐   interface (ABC): any data source
+      ┌────────────────────┐   interface (ABC): the service depends only on this
       │  WeatherProvider   │
       └─────────┬──────────┘
                 ▼
@@ -107,6 +120,7 @@ WARNING  weather.services.weather_service  error city=Atlantis reason=City not f
 
 ```
 src/weather/
+├── factory.py                 # create_weather_service(): picks the provider (mock by default)
 ├── exceptions.py              # WeatherServiceError and its 3 subclasses
 ├── models/
 │   └── forecast.py            # Forecast (response) and ForecastRequest (request)
@@ -114,7 +128,7 @@ src/weather/
 │   ├── base.py                # WeatherProvider interface
 │   └── mock_provider.py       # MockWeatherProvider and its 5 known cities
 ├── services/
-│   └── weather_service.py     # WeatherService (checks, logging, uses a provider)
+│   └── weather_service.py     # WeatherService (checks, logging, uses an injected provider)
 └── utils/
     └── validation.py          # API key check and city name clean-up
 tests/

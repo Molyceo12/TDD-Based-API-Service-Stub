@@ -1,13 +1,13 @@
-"""Send a few sample requests to WeatherService and print the results as a table.
+"""Send a few sample requests to the weather service and print the results as a table.
 
 Usage:
-    python -m poetry run python demo.py
+    python -m poetry run python examples/demo.py
 """
 
 import logging
 
+from weather import create_weather_service
 from weather.exceptions import WeatherServiceError
-from weather.services import WeatherService
 
 # (api_key, city): successes first, then at least one case per error.
 CASES = [
@@ -26,7 +26,7 @@ CASES = [
 def run(api_key: str, city: str) -> str:
     """Return the forecast, or the error name and message, as one line of text."""
     try:
-        forecast = WeatherService(api_key).get_forecast(city)
+        forecast = create_weather_service(api_key).get_forecast(city)
     except WeatherServiceError as exc:
         return f"{type(exc).__name__}: {exc}"
     return (
