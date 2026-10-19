@@ -2,7 +2,7 @@
 
 import pytest
 
-from weather.service import WeatherService
+from weather.services import WeatherService
 
 
 @pytest.fixture(name="service")

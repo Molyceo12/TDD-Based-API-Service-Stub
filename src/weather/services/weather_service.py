@@ -10,10 +10,9 @@ from weather.exceptions import (
 )
 from weather.models import Forecast, ForecastRequest
 from weather.providers import MockWeatherProvider, WeatherProvider
+from weather.utils import is_valid_api_key, normalize_city
 
 logger = logging.getLogger(__name__)
-
-VALID_API_KEYS = frozenset({"demo-key", "test-key"})
 
 
 class WeatherService:
@@ -42,7 +41,7 @@ class WeatherService:
             InvalidCityError: If the city name is empty or blank.
             CityNotFoundError: If the provider has no forecast for the city.
         """
-        name = city.strip()
+        name = normalize_city(city)
         logger.info("request city=%s", name)
         try:
             forecast = self._find(name)
@@ -59,7 +58,7 @@ class WeatherService:
 
     def _find(self, name: str) -> Forecast:
         """Check the request and return the provider's forecast."""
-        if self.api_key not in VALID_API_KEYS:
+        if not is_valid_api_key(self.api_key):
             raise InvalidAPIKeyError("Invalid API key")
         if not name:
             raise InvalidCityError("City name must not be empty")
