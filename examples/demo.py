@@ -7,7 +7,7 @@ Usage:
 import logging
 
 from weather.exceptions import WeatherServiceError
-from weather.service import WeatherService
+from weather.services import WeatherService
 
 # (api_key, city): successes first, then at least one case per error.
 CASES = [

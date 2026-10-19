@@ -11,7 +11,7 @@ from weather.exceptions import (
 )
 from weather.models import Forecast, ForecastRequest
 from weather.providers import WeatherProvider
-from weather.service import WeatherService
+from weather.services import WeatherService
 
 ATLANTIS = Forecast("Atlantis", 30.0, "Stormy", 99)
 
@@ -87,5 +87,7 @@ def test_all_errors_are_weather_service_errors(api_key: str, city: str) -> None:
 def test_get_forecast_reads_from_forecast_table(
     service: WeatherService, mocker: MockerFixture
 ) -> None:
-    mocker.patch.dict("weather.providers.KNOWN_FORECASTS", {"atlantis": ATLANTIS})
+    mocker.patch.dict(
+        "weather.providers.mock_provider.KNOWN_FORECASTS", {"atlantis": ATLANTIS}
+    )
     assert service.get_forecast("Atlantis") == ATLANTIS

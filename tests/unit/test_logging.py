@@ -5,13 +5,13 @@ import logging
 import pytest
 
 from weather.exceptions import CityNotFoundError
-from weather.service import WeatherService
+from weather.services import WeatherService
 
 
 def test_logs_request_and_response(
     service: WeatherService, caplog: pytest.LogCaptureFixture
 ) -> None:
-    caplog.set_level(logging.INFO, logger="weather.service")
+    caplog.set_level(logging.INFO, logger="weather.services.weather_service")
     service.get_forecast(" London ")
     assert caplog.messages == [
         "request city=London",
@@ -22,7 +22,7 @@ def test_logs_request_and_response(
 def test_logs_errors_as_warnings(
     service: WeatherService, caplog: pytest.LogCaptureFixture
 ) -> None:
-    caplog.set_level(logging.INFO, logger="weather.service")
+    caplog.set_level(logging.INFO, logger="weather.services.weather_service")
     with pytest.raises(CityNotFoundError):
         service.get_forecast("Atlantis")
     assert caplog.records[-1].levelname == "WARNING"

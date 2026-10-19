@@ -34,7 +34,7 @@ Without Poetry: `python -m pip install -r requirements.txt` then `python -m pip 
 ## Usage
 
 ```python
-from weather.service import WeatherService
+from weather.services import WeatherService
 
 service = WeatherService("demo-key")         # valid keys: "demo-key", "test-key"
 service.get_forecast("London")
@@ -49,14 +49,14 @@ WeatherService("wrong").get_forecast("London")   # InvalidAPIKeyError
 Try it from the terminal:
 
 ```bash
-python -m poetry run python -c "from weather.service import WeatherService; print(WeatherService('demo-key').get_forecast('Tokyo'))"
+python -m poetry run python -c "from weather.services import WeatherService; print(WeatherService('demo-key').get_forecast('Tokyo'))"
 ```
 
 Or run the demo, which prints sample forecasts and every error type as a table
 (the service's log lines are hidden there):
 
 ```bash
-python -m poetry run python demo.py
+python -m poetry run python examples/demo.py
 ```
 
 Output:
@@ -80,9 +80,9 @@ Output:
 Log lines (`key=value` style):
 
 ```
-INFO     weather.service  request city=London
-INFO     weather.service  response city=London condition=Cloudy temperature_c=15.0
-WARNING  weather.service  error city=Atlantis reason=City not found: Atlantis
+INFO     weather.services.weather_service  request city=London
+INFO     weather.services.weather_service  response city=London condition=Cloudy temperature_c=15.0
+WARNING  weather.services.weather_service  error city=Atlantis reason=City not found: Atlantis
 ```
 
 ## Architecture
@@ -105,12 +105,24 @@ WARNING  weather.service  error city=Atlantis reason=City not found: Atlantis
       └────────────────────┘
 ```
 
-| File | Content |
-|---|---|
-| `src/weather/models.py` | `Forecast` (response) and `ForecastRequest` (request) dataclasses |
-| `src/weather/exceptions.py` | `WeatherServiceError` and its 3 subclasses |
-| `src/weather/providers.py` | `WeatherProvider` interface and `MockWeatherProvider` |
-| `src/weather/service.py` | `WeatherService` (validation, logging, uses a provider) |
+```
+src/weather/
+├── exceptions.py              # WeatherServiceError and its 3 subclasses
+├── models/
+│   └── forecast.py            # Forecast (response) and ForecastRequest (request)
+├── providers/
+│   ├── base.py                # WeatherProvider interface
+│   └── mock_provider.py       # MockWeatherProvider and its 5 known cities
+├── services/
+│   └── weather_service.py     # WeatherService (checks, logging, uses a provider)
+└── utils/
+    └── validation.py          # API key check and city name clean-up
+tests/
+├── conftest.py                # shared service fixture
+└── unit/                      # one test file per part
+examples/
+└── demo.py                    # prints sample results as a table
+```
 
 **SOLID:** the service depends on the `WeatherProvider` abstraction (Dependency
 Inversion), receives it through its constructor (Dependency Injection), and each module
@@ -161,14 +173,15 @@ python -m poetry run python -m pytest -v
 python -m poetry run python -m pytest --cov --cov-report=term-missing
 ```
 
-**32 tests, 100% line and branch coverage** (fails below 95%), see
+**37 tests, 100% line and branch coverage** (fails below 95%), see
 [`reports/coverage.txt`](reports/coverage.txt).
 
 | Test file | Covers | pytest features |
 |---|---|---|
-| `test_service.py` | forecasts, errors, injected provider | fixture, `parametrize`, `pytest.raises`, `pytest-mock` |
-| `test_providers.py` | mock provider data | `parametrize` |
-| `test_logging.py` | request/response/error logs | `caplog` |
+| `unit/test_service.py` | forecasts, errors, injected provider | fixture, `parametrize`, `pytest.raises`, `pytest-mock` |
+| `unit/test_providers.py` | mock provider data | `parametrize` |
+| `unit/test_logging.py` | request/response/error logs | `caplog` |
+| `unit/test_validation.py` | API key check and city clean-up | `parametrize` |
 
 The `service` fixture in `tests/conftest.py` gives every test a ready client.
 
