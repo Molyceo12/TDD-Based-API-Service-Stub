@@ -9,23 +9,23 @@ from weather.exceptions import (
     WeatherServiceError,
 )
 from weather.models import Forecast, ForecastRequest
-from weather.providers import MockWeatherProvider, WeatherProvider
+from weather.providers import WeatherProvider
 from weather.utils import is_valid_api_key, normalize_city
 
 logger = logging.getLogger(__name__)
 
 
 class WeatherService:
-    """Client for the mock weather API.
+    """Weather API client that gets forecasts from an injected provider.
 
     Attributes:
         api_key: Key sent with every request; must be in ``VALID_API_KEYS``.
-        provider: Source of forecasts; ``MockWeatherProvider`` by default.
+        provider: Source of forecasts; any ``WeatherProvider`` implementation.
     """
 
-    def __init__(self, api_key: str, provider: WeatherProvider | None = None) -> None:
+    def __init__(self, api_key: str, provider: WeatherProvider) -> None:
         self.api_key = api_key
-        self.provider = provider or MockWeatherProvider()
+        self.provider = provider
 
     def get_forecast(self, city: str) -> Forecast:
         """Return the forecast for a city.
